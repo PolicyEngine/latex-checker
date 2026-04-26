@@ -70,7 +70,9 @@ def main():
         description="Check and fix LaTeX dollar sign issues in Markdown and Jupyter notebooks"
     )
     parser.add_argument("path", type=Path, help="File or directory to check")
-    parser.add_argument("--fix", action="store_true", help="Automatically fix issues")
+    parser.add_argument(
+        "--fix", action="store_true", help="Automatically fix issues"
+    )
     parser.add_argument(
         "--ignore-notebooks", action="store_true", help="Skip .ipynb files"
     )
@@ -93,7 +95,9 @@ def main():
         sys.exit(1)
 
     # Filter out build directories
-    files = [f for f in files if "_build" not in str(f) and ".venv" not in str(f)]
+    files = [
+        f for f in files if "_build" not in str(f) and ".venv" not in str(f)
+    ]
 
     total_issues = 0
     total_fixes = 0
