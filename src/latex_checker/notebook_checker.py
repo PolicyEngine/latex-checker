@@ -19,14 +19,14 @@ def find_unescaped_dollars_in_notebook(notebook: Dict) -> List[Dict]:
     """
     issues = []
 
-    for cell_idx, cell in enumerate(notebook.get('cells', [])):
-        if cell.get('cell_type') != 'markdown':
+    for cell_idx, cell in enumerate(notebook.get("cells", [])):
+        if cell.get("cell_type") != "markdown":
             continue
 
         # Combine source lines into single text
-        source = cell.get('source', [])
+        source = cell.get("source", [])
         if isinstance(source, list):
-            text = ''.join(source)
+            text = "".join(source)
         else:
             text = source
 
@@ -35,7 +35,7 @@ def find_unescaped_dollars_in_notebook(notebook: Dict) -> List[Dict]:
 
         # Add cell information
         for issue in cell_issues:
-            issue['cell'] = cell_idx
+            issue["cell"] = cell_idx
             issues.append(issue)
 
     return issues
@@ -52,16 +52,17 @@ def fix_unescaped_dollars_in_notebook(notebook: Dict) -> Dict:
         Fixed notebook dictionary
     """
     import copy
+
     fixed_notebook = copy.deepcopy(notebook)
 
-    for cell in fixed_notebook.get('cells', []):
-        if cell.get('cell_type') != 'markdown':
+    for cell in fixed_notebook.get("cells", []):
+        if cell.get("cell_type") != "markdown":
             continue
 
         # Get source
-        source = cell.get('source', [])
+        source = cell.get("source", [])
         if isinstance(source, list):
-            text = ''.join(source)
+            text = "".join(source)
         else:
             text = source
 
@@ -71,8 +72,8 @@ def fix_unescaped_dollars_in_notebook(notebook: Dict) -> Dict:
         # Update source (preserve list format if it was a list)
         if isinstance(source, list):
             # Split back into list maintaining original line breaks
-            cell['source'] = [fixed_text]
+            cell["source"] = [fixed_text]
         else:
-            cell['source'] = fixed_text
+            cell["source"] = fixed_text
 
     return fixed_notebook

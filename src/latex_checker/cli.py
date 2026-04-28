@@ -20,45 +20,45 @@ from latex_checker.notebook_checker import (
 
 def check_file(file_path: Path) -> List:
     """Check a single file for issues."""
-    if file_path.suffix == '.ipynb':
-        with open(file_path, 'r', encoding='utf-8') as f:
+    if file_path.suffix == ".ipynb":
+        with open(file_path, "r", encoding="utf-8") as f:
             notebook = json.load(f)
         issues = find_unescaped_dollars_in_notebook(notebook)
         for issue in issues:
-            issue['file'] = str(file_path)
+            issue["file"] = str(file_path)
         return issues
     else:  # Markdown file
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             text = f.read()
         issues = find_unescaped_dollars(text)
         for issue in issues:
-            issue['file'] = str(file_path)
+            issue["file"] = str(file_path)
         return issues
 
 
 def fix_file(file_path: Path) -> int:
     """Fix a single file. Returns number of fixes made."""
-    if file_path.suffix == '.ipynb':
-        with open(file_path, 'r', encoding='utf-8') as f:
+    if file_path.suffix == ".ipynb":
+        with open(file_path, "r", encoding="utf-8") as f:
             notebook = json.load(f)
 
         issues_before = len(find_unescaped_dollars_in_notebook(notebook))
         fixed_notebook = fix_unescaped_dollars_in_notebook(notebook)
 
         if issues_before > 0:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 json.dump(fixed_notebook, f, indent=1, ensure_ascii=False)
 
         return issues_before
     else:  # Markdown file
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, "r", encoding="utf-8") as f:
             text = f.read()
 
         issues_before = len(find_unescaped_dollars(text))
         fixed_text = fix_unescaped_dollars(text)
 
         if issues_before > 0:
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, "w", encoding="utf-8") as f:
                 f.write(fixed_text)
 
         return issues_before
@@ -67,22 +67,14 @@ def fix_file(file_path: Path) -> int:
 def main():
     """Main CLI entry point."""
     parser = argparse.ArgumentParser(
-        description='Check and fix LaTeX dollar sign issues in Markdown and Jupyter notebooks'
+        description="Check and fix LaTeX dollar sign issues in Markdown and Jupyter notebooks"
+    )
+    parser.add_argument("path", type=Path, help="File or directory to check")
+    parser.add_argument(
+        "--fix", action="store_true", help="Automatically fix issues"
     )
     parser.add_argument(
-        'path',
-        type=Path,
-        help='File or directory to check'
-    )
-    parser.add_argument(
-        '--fix',
-        action='store_true',
-        help='Automatically fix issues'
-    )
-    parser.add_argument(
-        '--ignore-notebooks',
-        action='store_true',
-        help='Skip .ipynb files'
+        "--ignore-notebooks", action="store_true", help="Skip .ipynb files"
     )
 
     args = parser.parse_args()
@@ -91,9 +83,9 @@ def main():
     if args.path.is_file():
         files = [args.path]
     elif args.path.is_dir():
-        patterns = ['**/*.md']
+        patterns = ["**/*.md"]
         if not args.ignore_notebooks:
-            patterns.append('**/*.ipynb')
+            patterns.append("**/*.ipynb")
 
         files = []
         for pattern in patterns:
@@ -103,7 +95,9 @@ def main():
         sys.exit(1)
 
     # Filter out build directories
-    files = [f for f in files if '_build' not in str(f) and '.venv' not in str(f)]
+    files = [
+        f for f in files if "_build" not in str(f) and ".venv" not in str(f)
+    ]
 
     total_issues = 0
     total_fixes = 0
@@ -118,10 +112,10 @@ def main():
         else:
             issues = check_file(file_path)
             if issues:
-                print(f"\n{'='*80}")
+                print(f"\n{'=' * 80}")
                 print(f"File: {file_path}")
                 print(f"Found {len(issues)} issue(s)")
-                print('='*80)
+                print("=" * 80)
 
                 for issue in issues[:5]:  # Show first 5
                     print(f"\nLine {issue['line']}, Column {issue['column']}:")
@@ -134,7 +128,7 @@ def main():
                 total_issues += len(issues)
 
     # Print summary
-    print(f"\n{'='*80}")
+    print(f"\n{'=' * 80}")
 
     if args.fix:
         print(f"Total files processed: {len(files)}")
@@ -152,9 +146,9 @@ def main():
         else:
             print("\n✓ No unescaped dollar signs found!")
 
-    print('='*80)
+    print("=" * 80)
     sys.exit(0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
